@@ -4,7 +4,7 @@
   <style>
   iframe {
     width: 95%;
-    min-height: 450px;
+    min-height: 70%;
     margin-left: auto;
     margin-right: auto;
     margin-bottom: 2em;
@@ -14,17 +14,20 @@
     width: 95%;
   }
   textarea {
-    height: 8em;
+    height: 12em;
   }
   </style>
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+	<script src="http://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/sha256.js"></script>
   <script src="render.js"></script>
 </head>
 
 <body>
 
 <form>
-<textarea id='editor' wrap='off' oninput='updateUrl();'></textarea>
+<textarea id='editor' wrap='off'></textarea>
+<button onclick='document.getElementById("result").contentWindow.render(formToDataUrl()); return false'>Update</button>
+			
 </form>
 
 <div id='viewurl'><a href=''>foo</a></div>
@@ -47,11 +50,30 @@ function argsToForm(args) {
 
 function niceEncode(s) {
   // we could use encodeURIComponent() here, but it's too fancy.  Let's
-  // *only* encode & characters so the resulting URL looks as nice as
+  // *only* encode & and % characters so the resulting URL looks as nice as
   // possible.
-  return s.replace(/&/g, '%26');
+  return s.replace(/&/g, '%26').replace(/%/g, '%25');
 }
 
+function formToDataUrl() {
+  var urlbase = window.location.protocol + '//' + window.location.host;
+  var out = [];
+  var parts = $('#editor').attr('value').trim().split('\n');
+  for (var parti in parts) {
+    var part = parts[parti];
+    if (part) {
+      var bits = afterquery.internal.trySplitOne(part, '=');
+      if (bits) {
+        out.push(niceEncode(bits[0]) + '=' + niceEncode(bits[1]));
+      } else {
+        out.push(niceEncode(part));
+      }
+    }
+  }
+  var ret = '?' + out.join('&');
+	console.log("formToDataUrl=" + ret);
+	return ret;
+}
 
 function formToUrl() {
   var urlbase = window.location.protocol + '//' + window.location.host;
@@ -68,7 +90,9 @@ function formToUrl() {
       }
     }
   }
-  return urlbase + '?' + out.join('&');
+  var ret = urlbase + '?' + out.join('&');
+	console.debug("formToUrl= " + ret);
+	return ret;
 }
 
 

@@ -1439,12 +1439,15 @@ var afterquery = (function() {
     if (auth) {
       plus += '&auth=' + encodeURIComponent(auth);
     }
+		
+		//TODO(hisham): re-enable this
+    //if (url.indexOf('?') >= 0) {
+    //  return url + '&' + plus;
+    //} else {
+    //  return url + '?' + plus;
+    //}
 
-    if (url.indexOf('?') >= 0) {
-      return url + '&' + plus;
-    } else {
-      return url + '?' + plus;
-    }
+		return url;
   }
 
 
@@ -1547,6 +1550,9 @@ var afterquery = (function() {
     }
 
     enqueue(queue, 'parse', function(rawdata, done) {
+			var url = args.get('url');
+			console.debug("caching data for " + url);
+			cache[hash(url)] = rawdata;
       console.debug('rawdata:', rawdata);
       var outgrid = gridFromData(rawdata);
       console.debug('grid:', outgrid);
@@ -1563,13 +1569,24 @@ var afterquery = (function() {
     runqueue(queue, startdata, done);
   }
 
+	var cache = {};
+
+	function hash(str) {
+		return CryptoJS.SHA256(str);
+	}
 
   function render(query, startdata, done) {
     var args = parseArgs(query);
+		console.debug(args);
     var editlink = args.get('editlink');
     if (editlink == 0) {
       $('#editmenu').hide();
     }
+
+		var k = hash(args.get("url"));
+		console.debug("looking for data in cache: " + k);
+		startdata = cache[k];
+		if (startdata) { console.log("cache hit!!!"); }
 
     var queue = [];
     addUrlGetters(queue, args, startdata);

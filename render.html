@@ -55,6 +55,7 @@
   }
   </style>
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.js"></script>
+	<script src="http://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/sha256.js"></script>
   <script src="dygraph-combined.js"></script>
   <script src="https://www.google.com/jsapi"></script>
   <script>
@@ -75,8 +76,13 @@
 <div id='vizlog'></div>
 
 <script>
+
 $('#editlink').attr('href', '/edit' + window.location.search);
 afterquery.render(window.location.search);
+
+function render(url) {
+	afterquery.render(url);
+}
 </script>
 
 </body>
