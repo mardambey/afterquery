@@ -996,18 +996,24 @@ var afterquery = (function() {
 
 
   function extractRegexp(grid, colname, regexp) {
+		var outgrid = {headers: grid.headers, data: [], types: grid.types};
     var r = RegExp(regexp);
     var colnum = keyToColNum(grid, colname);
     for (var rowi in grid.data) {
-      var row = grid.data[rowi];
+			// clone the row via slice(0), we have 
+			// to do this because we can't mutate the 
+			// cached copy of the data
+      var row = grid.data[rowi].slice(0);
       var match = r.exec(row[colnum]);
       if (match) {
         row[colnum] = match.slice(1).join('');
       } else {
         row[colnum] = '';
       }
+
+			outgrid.data.push(row);
     }
-    return grid;
+    return outgrid;
   }
 
 
